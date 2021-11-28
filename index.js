@@ -25,31 +25,28 @@ async function run() {
       const usersCollection=database.collection('users')
       const reviewCollection=database.collection('review')
 
-
+      /* get product */
     app.get('/products',async(req,res)=>{
       const query={}
       const cursor=productCollection.find(query)
       const products=await cursor.toArray();
       res.json(products);
     })
-
+    /* order in my order page */
     app.post('/products',async(req,res)=>{
       const order=req.body
-     console.log("our data",order)
       const result=await productCollection.insertOne(order)
       res.json(result);
   })
   /* product add */
     app.post('/products',async(req,res)=>{
       const order=req.body
-     console.log("our data",order)
       const result=await orderCollection.insertOne(order)
       res.json(result);
   })
   /* review post */
   app.post('/review',async(req,res)=>{
     const review=req.body
-    console.log("our",review)
     const result=await reviewCollection.insertOne(review)
     res.json(result)
   })
@@ -77,7 +74,7 @@ async function run() {
   /* put save data in database */
   app.post('/order',async(req,res)=>{
       const myOrder=req.body
-     console.log("our data",myOrder)
+    /*  console.log("our data",myOrder) */
       const result=await orderCollection.insertOne(myOrder)
       res.json(result);
   })
@@ -88,6 +85,19 @@ async function run() {
       const cursor=orderCollection.find(query)
       const event=await cursor.toArray()
       res.json(event)
+
+  })
+  /* amer id admin kina ta check korchi */
+  app.get('/users/:email',async(req,res)=>{
+    const email=req.params.email;
+    /* find email */
+    const query={email:email};
+    const user=await usersCollection.findOne(query);
+    let isAdmin=false;
+    if(user?.role==='admin'){
+      isAdmin=true;
+    }
+    res.json({admin:isAdmin})
 
   })
 
@@ -102,13 +112,34 @@ async function run() {
 
   })
   app.post('/users',async(req,res)=>{
-    const user=req.body
-   
+    const user=req.body;
     const result=await usersCollection.insertOne(user)
-    console.log(result)
+    
     res.json(result);
 })
+
+/* add user at google login and prevent re-enter data in user database  */
+app.put('/users' ,async(req,res)=>{
+  const user=req.body;
+  console.log('put',user)
+  const filter={email:user.email};
+  const option={ upsert: true};
+  const updateDoc={$set:user};
+  const result=await usersCollection.updateOne(filter,updateDoc,option);
   
+    res.json(result)
+
+})
+  
+/* add role as admin a user */
+app.put('/users/admin', async(req,res)=>{
+const  user=req.body;
+/* console.log('put',user) */
+const filter={email:user.email};
+const updateDoc={$set:{role:'admin'}};
+const result=await usersCollection.updateOne(filter,updateDoc);
+res.json(result)
+})
 
       console.log('connected ok ')
     } finally {
@@ -120,7 +151,7 @@ async function run() {
 
 
 app.get('/', (req, res) => {
-  res.send('server is running')
+  res.send('server is running at 5000 port')
 })
 
 app.listen(port, () => {
