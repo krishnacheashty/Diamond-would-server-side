@@ -69,7 +69,7 @@ async function run() {
       res.json(products)
   })
 
-  
+
 
 
   /* put save data in database */
@@ -92,7 +92,7 @@ async function run() {
   app.get('/users/:email',async(req,res)=>{
     const email=req.params.email;
     /* find email */
-    const query={email:email};
+    const query={email:email}; 
     const user=await usersCollection.findOne(query);
     let isAdmin=false;
     if(user?.role==='admin'){
