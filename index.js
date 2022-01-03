@@ -129,7 +129,7 @@ async function run() {
 /* add user at google login and prevent re-enter data in user database  */
 app.put('/users' ,async(req,res)=>{
   const user=req.body;
-  console.log('put',user)
+  // console.log('put',user)
   const filter={email:user.email};
   const option={ upsert: true};
   const updateDoc={$set:user};
